@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>中2理科1分野3学期学年末試験対策</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #f59e0b;
+            --text-color: #1f2937;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            touch-action: manipulation; /* スマホでの操作性向上 */
+        }
+
+        body {
+            font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+        }
+
+        /* ヘッダー */
+        header {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .version {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-top: 0.2rem;
+        }
+
+        /* コンテナ */
+        #app-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* 画面切り替え用 */
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+            width: 100%;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* メニューボタン */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        button {
+            background-color: white;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* 小さなナビゲーションボタン用 */
+        .btn-small-nav {
+            width: auto;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            background: transparent;
+            border: 1px solid #9ca3af;
+            color: #6b7280;
+            box-shadow: none;
+            margin: 0;
+        }
+
+        .category-btn {
+            text-align: left;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .category-btn::before {
+            content: "●";
+            position: absolute;
+            left: 0.5rem;
+            color: var(--accent-color);
+        }
+
+        .mode-select {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .mode-btn {
+            flex: 1;
+            background: #e5e7eb;
+            border: none;
+            color: #6b7280;
+        }
+
+        .mode-btn.selected {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+        }
+
+        /* 統合・発展ボタンの特別スタイル */
+        .btn-all {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+        }
+        
+        .btn-advanced {
+            border-color: var(--danger-color);
+            color: var(--danger-color);
+            background: #fff5f5;
+        }
+
+        /* クイズカード */
+        .card-container {
+            perspective: 1000px;
+            width: 100%;
+            height: 400px; /* 固定高さ */
+            position: relative;
+            cursor: pointer;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            background: #f0f9ff;
+            border: 2px solid var(--primary-color);
+            justify-content: space-between; /* コンテンツを分散 */
+            padding: 1.5rem;
+        }
+        
+        /* 答えレイアウト修正用: 中央寄せ */
+        .answer-content {
+            width: 100%;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            font-weight: bold;
+            line-height: 1.5;
+        }
+
+        .answer-text {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--danger-color);
+            margin-bottom: 1rem;
+        }
+
+        .explanation-text {
+            font-size: 1rem;
+            color: #4b5563;
+            text-align: left;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            width: 100%;
+            max-height: 150px;
+            overflow-y: auto;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .tap-hint {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+
+        /* 判定ボタン */
+        .judgment-area {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            height: 60px;
+        }
+
+        .btn-ng {
+            background-color: #fee2e2;
+            color: var(--danger-color);
+            border: none;
+            flex: 1;
+        }
+
+        .btn-ok {
+            background-color: #d1fae5;
+            color: var(--success-color);
+            border: none;
+            flex: 1;
+        }
+
+        /* プログレスバー */
+        .progress-container {
+            width: 100%;
+            background-color: #e5e7eb;
+            border-radius: 999px;
+            height: 10px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        /* 結果画面 */
+        .result-stats {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .score-display {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 1rem 0;
+        }
+
+        .message {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn-retry {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            margin-bottom: 1rem;
+        }
+
+        .btn-home {
+            background: #6b7280;
+            color: white;
+            border: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>中2理科 学年末試験対策</h1>
+        <div class="version" id="version-display">ver 1.0.0</div>
+    </header>
+
+    <div id="app-container">
+        
+        <!-- メニュー画面 -->
+        <div id="menu-screen" class="screen active">
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <p>学習するモードを選んでください</p>
+                <div class="mode-select">
+                    <button class="mode-btn selected" onclick="setMode('sequential')">順番通り</button>
+                    <button class="mode-btn" onclick="setMode('random')">ランダム</button>
+                </div>
+            </div>
+
+            <div class="menu-grid">
+                <button class="btn-all" onclick="startQuiz('all')">🔥 全分野統合チャレンジ</button>
+                <button class="category-btn" onclick="startQuiz('static_electricity')">1. 静電気と電子</button>
+                <button class="category-btn" onclick="startQuiz('current_magnetic')">2. 電流と磁界</button>
+                <button class="category-btn" onclick="startQuiz('force_magnetic')">3. 電流が磁界から受ける力</button>
+                <button class="category-btn" onclick="startQuiz('induction')">4. 電磁誘導と発電</button>
+                <button class="category-btn" onclick="startQuiz('force_composition')">5. 力の合成と分解</button>
+                <button class="category-btn btn-advanced" onclick="startQuiz('adv_electricity')">🚀 発展：電気と磁気</button>
+                <button class="category-btn btn-advanced" onclick="startQuiz('adv_force')">🚀 発展：力学</button>
+            </div>
+        </div>
+
+        <!-- クイズ画面 -->
+        <div id="quiz-screen" class="screen">
+            <!-- ナビゲーションエリア -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <button class="btn-small-nav" onclick="goHome()">🏠 中断</button>
+                <div style="font-size: 0.9rem; color: #6b7280;">残り: <span id="remaining-count">0</span>問</div>
+            </div>
+
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+
+            <div class="card-container" onclick="flipCard()">
+                <div class="card" id="quiz-card">
+                    <!-- 表面 -->
+                    <div class="card-face card-front">
+                        <div style="font-size: 0.9rem; color: var(--primary-color); position: absolute; top: 1rem;">Q. <span id="q-num">1</span></div>
+                        <div id="question-text" class="question-text">ここに問題が表示されます</div>
+                        <div class="tap-hint">タップして答えを表示</div>
+                    </div>
+                    <!-- 裏面 -->
+                    <div class="card-face card-back">
+                        <div class="answer-content">
+                            <div style="font-size: 0.8rem; color: #6b7280; margin-bottom: 0.5rem;">正解</div>
+                            <div id="answer-text" class="answer-text">ここに答え</div>
+                            <div id="explanation-area" class="explanation-text" style="display:none;"></div>
+                        </div>
+                        <div style="font-size: 0.8rem; color: #6b7280;">理解できましたか？</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="judgment-area" id="judgment-buttons" style="visibility: hidden;">
+                <button class="btn-ng" onclick="handleAnswer(false)">😰 まだ (後でやる)</button>
+                <button class="btn-ok" onclick="handleAnswer(true)">😊 覚えた！</button>
+            </div>
+        </div>
+
+        <!-- 結果画面 -->
+        <div id="result-screen" class="screen">
+            <div class="result-stats">
+                <h2>学習完了！</h2>
+                <div class="score-display">
+                    <span id="score-num">0</span> / <span id="total-num">0</span>
+                </div>
+                <p id="result-message" class="message">お疲れ様でした！</p>
+                
+                <div id="retry-container" style="display: none;">
+                    <p>間違えた問題が <span id="wrong-count" style="color: var(--danger-color); font-weight: bold;">0</span> 問あります。</p>
+                    <button class="btn-retry" onclick="retryWrong()">💪 間違えた問題だけやる</button>
+                </div>
+
+                <button class="btn-home" onclick="goHome()">🏠 メニューに戻る</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ==========================================
+        // 設定・データ定義
+        // ==========================================
+        const APP_VERSION = "Ver 1.2.3"; // 更新時はここを書き換える
+        document.getElementById('version-display').innerText = APP_VERSION;
+
+        // 問題データ
+        const questionsDB = [
+            // 1. 静電気と電子
+            { id: 1, category: 'static_electricity', q: "2種類の物体をこすり合わせたときに発生し、物体にたまった電気を何というか？", a: "静電気" },
+            { id: 2, category: 'static_electricity', q: "物体をこすり合わせたとき、一方の物体から他方の物体へ移動する「－（マイナス）の電気を帯びた粒子」を何というか？", a: "電子" },
+            { id: 3, category: 'static_electricity', q: "異なる種類の電気（＋と－）どうしは、引き合うか、しりぞけ合うか？", a: "引き合う" },
+            { id: 4, category: 'static_electricity', q: "同じ種類の電気（＋と＋、－と－）どうしは、引き合うか、しりぞけ合うか？", a: "しりぞけ合う（反発する）" },
+            { id: 5, category: 'static_electricity', q: "たまっていた電気が流れ出す現象や、電気が空間を移動する現象を何というか？", a: "放電" },
+            { id: 6, category: 'static_electricity', q: "気圧を低くした空間を電流が流れる現象を何というか？", a: "真空放電" },
+            { id: 7, category: 'static_electricity', q: "真空放電の実験で、－極（陰極）から出て＋極へ向かう電子の流れを何というか？", a: "陰極線（電子線）" },
+            { id: 8, category: 'static_electricity', q: "陰極線に電圧を加えたとき、＋極と－極のどちらの方へ曲がるか？", a: "＋極", exp: "電子は－の電気を持っているため＋に引き寄せられます。" },
+            { id: 9, category: 'static_electricity', q: "電流の流れる向きは「＋極から－極」だが、電子の移動する向きはどちらか？", a: "－極から＋極" },
+            { id: 10, category: 'static_electricity', q: "X線やα線などのように、物質を通りぬけたり物質の性質を変えたりする能力をもつものをまとめて何というか？", a: "放射線" },
+
+            // 2. 電流と磁界
+            { id: 11, category: 'current_magnetic', q: "磁石による力がはたらく空間を何というか？", a: "磁界" },
+            { id: 12, category: 'current_magnetic', q: "磁界の中に置いた方位磁針の何極が指す向きを「磁界の向き」とするか？", a: "N極" },
+            { id: 13, category: 'current_magnetic', q: "磁界の向きを順につないでできる曲線を何というか？", a: "磁力線" },
+            { id: 14, category: 'current_magnetic', q: "磁力線は磁石の何極から出て何極に入るか？", a: "N極から出てS極に入る" },
+            { id: 15, category: 'current_magnetic', q: "磁力線の間隔がせまいところほど、磁界の強さはどうなっているか？", a: "強い" },
+            { id: 16, category: 'current_magnetic', q: "直線状の導線に電流を流したとき、そのまわりにできる磁界の形はどのようなものか？", a: "同心円状" },
+            { id: 17, category: 'current_magnetic', q: "導線を流れる電流の向きと磁界の向きの関係を表す法則（右手の親指を電流の向きに合わせたときなど）を、「〇〇の法則」というか？", a: "右ねじの法則" },
+            { id: 18, category: 'current_magnetic', q: "導線を流れる電流を大きくすると、まわりの磁界の強さはどうなるか？", a: "強くなる" },
+            { id: 19, category: 'current_magnetic', q: "コイルの内側にできる磁界は、曲がっているか、まっすぐか？", a: "まっすぐ" },
+            { id: 20, category: 'current_magnetic', q: "コイルに電流を流したとき、右手の4本の指を電流の向きに合わせると、親指が指すのは何の向きか？", a: "磁界の向き（そのコイルのN極の方向）" },
+            { id: 21, category: 'current_magnetic', q: "コイルの中に鉄心を入れると、磁界が非常に強くなる。これを利用した磁石を何というか？", a: "電磁石" },
+            { id: 22, category: 'current_magnetic', q: "コイルがつくる磁界を強くする方法を、「鉄心を入れる」以外で2つ答えよ。", a: "電流を大きくする、コイルの巻数を多くする" },
+
+            // 3. 電流が磁界から受ける力
+            { id: 23, category: 'force_magnetic', q: "磁界の中にある導線に電流を流すと、導線は磁界から力を受ける。電流の向き、磁界の向き、力の向きは、互いにどのような角度になっているか？", a: "垂直" },
+            { id: 24, category: 'force_magnetic', q: "電流が磁界から受ける力の向きを逆にするには、どうすればよいか？（2つ）", a: "電流の向きを逆にする、磁界の向きを逆にする" },
+            { id: 25, category: 'force_magnetic', q: "電流が磁界から受ける力の「大きさ」を大きくするには、どうすればよいか？（2つ）", a: "電流を大きくする、磁力を強くする" },
+            { id: 26, category: 'force_magnetic', q: "電流が磁界から受ける力を利用して、コイルが連続的に回転するようにした装置を何というか？", a: "モーター（電動機）" },
+            { id: 27, category: 'force_magnetic', q: "モーターにおいて、コイルが半回転するごとに電流の向きを自動的に切りかえ、同じ向きに回転し続けさせる部品を何というか？", a: "整流子" },
+            { id: 28, category: 'force_magnetic', q: "フレミングの左手の法則において、中指は何の向きを表すか？", a: "電流の向き" },
+            { id: 29, category: 'force_magnetic', q: "フレミングの左手の法則において、人差し指は何の向きを表すか？", a: "磁界の向き" },
+            { id: 30, category: 'force_magnetic', q: "フレミングの左手の法則において、親指は何の向きを表すか？", a: "力の向き" },
+
+            // 4. 電磁誘導と発電
+            { id: 31, category: 'induction', q: "コイルの中の磁界が変化すると、電圧が生じてコイルに電流が流れる現象を何というか？", a: "電磁誘導" },
+            { id: 32, category: 'induction', q: "電磁誘導によって流れる電流を何というか？", a: "誘導電流" },
+            { id: 33, category: 'induction', q: "磁石のN極をコイルに近づけたときと、遠ざけたときでは、流れる誘導電流の向きはどうなるか？", a: "逆になる" },
+            { id: 34, category: 'induction', q: "誘導電流を大きくする方法を3つ答えよ。", a: "磁石を速く動かす、磁力の強い磁石を使う、コイルの巻数を多くする" },
+            { id: 35, category: 'induction', q: "わずかな電流でも針が振れ、電流の向きや大きさを調べることができる計器を何というか？", a: "検流計" },
+            { id: 36, category: 'induction', q: "乾電池の電流のように、流れる向きが変わらない電流を何というか？", a: "直流" },
+            { id: 37, category: 'induction', q: "家庭のコンセントの電流のように、流れる向きと大きさが周期的に変わる電流を何というか？", a: "交流" },
+            { id: 38, category: 'induction', q: "交流において、1秒間にくり返される波の数（電流の変化の回数）を何というか？", a: "周波数" },
+            { id: 39, category: 'induction', q: "周波数の単位は何か？記号で答えよ。", a: "Hz（ヘルツ）" },
+            { id: 40, category: 'induction', q: "東日本と西日本では周波数が異なる。それぞれ何Hzか？", a: "東日本：50Hz、西日本：60Hz" },
+            { id: 41, category: 'induction', q: "発光ダイオード（LED）に交流の電流を流すと、光り方はどうなるか？", a: "点滅をくり返す", exp: "順方向の電流のときだけ光るためです。" },
+
+            // 5. 力の合成と分解
+            { id: 42, category: 'force_composition', q: "1つの物体にはたらく2つの力を、それと同じはたらきをする1つの力におきかえることを何というか？", a: "力の合成" },
+            { id: 43, category: 'force_composition', q: "力の合成によって求められた1つの力を何というか？", a: "合力" },
+            { id: 44, category: 'force_composition', q: "一直線上で「同じ向き」の2力の合力の大きさは、2力の和か、差か？", a: "和" },
+            { id: 45, category: 'force_composition', q: "角度を持ってはたらく2力の合力を求めるときに利用する、その2力を2辺とする四角形を何というか？", a: "平行四辺形" },
+            { id: 46, category: 'force_composition', q: "2力の角度が大きくなるほど、合力の大きさはどうなるか？", a: "小さくなる" },
+            { id: 47, category: 'force_composition', q: "1つの力を、それと同じはたらきをする2つの力に分けることを何というか？", a: "力の分解" },
+            { id: 48, category: 'force_composition', q: "力の分解によって分けられた2つの力を何というか？", a: "分力" },
+            { id: 49, category: 'force_composition', q: "1つの力を2方向に分解するとき、もとの力が何になるように平行四辺形を作図するか？", a: "対角線" },
+            { id: 50, category: 'force_composition', q: "斜面上の物体にはたらく重力は、どのような2つの方向に分解して考えることが多いか？", a: "斜面に平行な分力と、斜面に垂直な分力" },
+            { id: 51, category: 'force_composition', q: "斜面の角度を大きくすると、「斜面に平行な分力（滑り落ちようとする力）」の大きさはどうなるか？", a: "大きくなる" },
+            { id: 52, category: 'force_composition', q: "斜面上の物体が静止しているとき、重力の「斜面に垂直な分力」とつり合っている力は何か？", a: "垂直抗力" },
+
+            // 発展：電気と磁気
+            { id: 101, category: 'adv_electricity', q: "陰極線（電子線）に電圧を加えると＋極側に曲がることから、電子はどのような性質を持っていることがわかるか？", a: "－（マイナス）の電気を帯びている", exp: "＋の電気と－の電気は引き合うため、＋極側に引き寄せられます。" },
+            { id: 102, category: 'adv_electricity', q: "異なる物質（ストローとティッシュなど）をこすり合わせると静電気が発生するのはなぜか？「電子」という言葉を使って説明せよ。", a: "一方の物体から他方の物体へ電子が移動するから", exp: "電子を受け取った側は－に、失った側は＋に帯電します。" },
+            { id: 103, category: 'adv_electricity', q: "電磁石のコイルの中に鉄心を入れると、磁界が非常に強くなるのはなぜか？", a: "鉄心が磁石になり、その磁界がコイルの磁界に重なるから", exp: "単に「鉄が磁気を集める」だけでなく、鉄自体が磁石化して磁界を強めます。" },
+            { id: 104, category: 'adv_electricity', q: "コイルに流れる電流がつくる磁界について、電流の向きを逆にすると磁界の向きはどうなるか？", a: "逆になる" },
+            { id: 105, category: 'adv_electricity', q: "モーターの整流子は、モーターが回り続けるためにどのような役割を果たしているか？", a: "コイルが半回転するごとに、電流の向きを切りかえる役割", exp: "電流の向きが変わることで、常に同じ回転方向への力を受け続けられるようになります。" },
+            { id: 106, category: 'adv_electricity', q: "モーターにおいて、「磁石の極」を逆にし、さらに「電流の向き」も逆にした場合、回転方向はどうなるか？", a: "元の回転方向と同じになる", exp: "磁界の向きと電流の向きの両方が逆になると、力の向きは元に戻ります。" },
+            { id: 107, category: 'adv_electricity', q: "コイルに磁石のN極を近づけたとき、検流計の針が右に振れた。針を「左」に振れさせる操作を1つ答えよ。", a: "磁石のN極を遠ざける / 磁石のS極を近づける", exp: "磁界の変化の向き（増えるか減るか）や磁石の極を変えると、誘導電流の向きが逆になります。" },
+            { id: 108, category: 'adv_electricity', q: "発光ダイオード（LED）に交流の電流を流して左右に振ると、光の点線ができる。これは交流のどのような性質によるものか？", a: "電流の流れる向きが周期的に入れかわる性質", exp: "LEDは一方向にしか電流を通さないため、交流では点灯と消灯を繰り返します。" },
+            { id: 109, category: 'adv_electricity', q: "「発電機」と「モーター」のエネルギー変換の違いは？", a: "発電機：運動→電気\nモーター：電気→運動", exp: "発電機は回して電気を作り、モーターは電気で回ります。" },
+            { id: 110, category: 'adv_electricity', q: "Ｕ字型磁石の間に置いたコイルに電流を流したとき、コイルが受ける力を大きくするには、「抵抗器」をどうすればよいか？", a: "抵抗の値を小さくする", exp: "抵抗を小さくすると電流が大きくなり、力も強くなります。" },
+
+            // 発展：力学
+            { id: 111, category: 'adv_force', q: "2人が荷物を持つとき、2人の間隔を広げて角度を大きくしていくと、1人が必要な力はどうなるか？", a: "大きくなる", exp: "角度が大きくなるほど、合力が小さくなるため（同じ重さを支えるには、より大きな分力が必要）。" },
+            { id: 112, category: 'adv_force', q: "斜面上にある物体にはたらく重力を、「平行」と「垂直」に分解するのはなぜか？", a: "滑り落ちる動きと、面を押す動きに関係する力に分けるため", exp: "動きの方向に合わせた成分に分けることで、運動を理解しやすくなります。" },
+            { id: 113, category: 'adv_force', q: "斜面の傾き（角度）を急にすると、重力の「斜面に平行な分力」と「垂直な分力」はどう変化するか？", a: "平行な分力：大きくなる\n垂直な分力：小さくなる", exp: "坂が急になるほど落ちようとする力は増し、地面を押さえつける力は減ります。" },
+            { id: 114, category: 'adv_force', q: "斜面上の物体が静止しているとき、重力の「斜面に平行な分力」とつり合っている力は何か？", a: "摩擦力", exp: "滑り落ちようとする力（平行な分力）を、逆向きの摩擦力が打ち消して止めています。" },
+            { id: 115, category: 'adv_force', q: "1つの点にはたらく2力の合力を作図するとき、どのような図形を描けばよいか？", a: "平行四辺形", exp: "2力を2辺とする平行四辺形の対角線が合力です。" },
+            { id: 116, category: 'adv_force', q: "一直線上にない2力の合力Fの大きさについて、正しい式は？（F1+F2 = F または F1+F2 > F）", a: "F1 + F2 > F", exp: "三角形の2辺の和は他の一辺より長いという理屈と同じです。" },
+            { id: 117, category: 'adv_force', q: "3つの力F1,F2,F3がつり合っているとき、F1とF2の合力Fと、F3との関係は？", a: "大きさは等しく、向きは反対で一直線上にある", exp: "2つの力をまとめた合力が、残りの1つの力とつり合う関係になります。" },
+            { id: 118, category: 'adv_force', q: "坂道に車を止めておくとき、坂が急なほどブレーキを強くかけなければならない理由は？（分力を使って）", a: "重力の斜面に平行な分力が大きくなるため", exp: "滑り落ちようとする力が大きくなるので、それを支える摩擦力も大きくする必要があります。" },
+            { id: 119, category: 'adv_force', q: "10Nの力を分解するとき、分解してできる2つの分力は、どちらも10Nより大きくなることはあるか？", a: "ある", exp: "分力の角度が非常に大きい（180度に近づく）場合、平行四辺形の辺は対角線よりも長くなることがあります。" },
+            { id: 120, category: 'adv_force', q: "「垂直抗力」とは、具体的にどのような力か？", a: "斜面が物体を、面に垂直に押し返す力", exp: "重力の斜面に垂直な分力とつり合っています。" }
+        ];
+
+        // ==========================================
+        // アプリの状態管理
+        // ==========================================
+        let currentQueue = [];
+        let currentIndex = 0;
+        let correctCount = 0;
+        let wrongQueue = [];
+        let currentMode = 'sequential'; // 'sequential' or 'random'
+        let isCardFlipped = false;
+
+        // ==========================================
+        // UI制御関数
+        // ==========================================
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // ==========================================
+        // クイズロジック
+        // ==========================================
+
+        function startQuiz(category) {
+            // 問題の抽出
+            if (category === 'all') {
+                // 発展以外の全て
+                currentQueue = questionsDB.filter(q => !q.category.startsWith('adv_'));
+            } else {
+                currentQueue = questionsDB.filter(q => q.category === category);
+            }
+
+            if (currentQueue.length === 0) {
+                alert("このカテゴリの問題はまだありません。");
+                return;
+            }
+
+            // ランダムモードならシャッフル
+            if (currentMode === 'random') {
+                shuffleArray(currentQueue);
+            } else {
+                // 順番通りの場合、ID順にソート（念のため）
+                currentQueue.sort((a, b) => a.id - b.id);
+            }
+
+            // 初期化
+            currentIndex = 0;
+            correctCount = 0;
+            wrongQueue = [];
+            
+            updateProgress();
+            showCard();
+            switchScreen('quiz-screen');
+        }
+
+        function retryWrong() {
+            currentQueue = [...wrongQueue]; // コピーを作成
+            wrongQueue = []; // リセット
+            currentIndex = 0;
+            correctCount = 0;
+            
+            // 間違えた問題はランダムに出題したほうが効果的なのでシャッフル
+            shuffleArray(currentQueue);
+
+            updateProgress();
+            showCard();
+            switchScreen('quiz-screen');
+        }
+
+        function showCard() {
+            const card = document.getElementById('quiz-card');
+            const q = currentQueue[currentIndex];
+            
+            // カードを表面に戻す
+            card.classList.remove('flipped');
+            isCardFlipped = false;
+
+            // コンテンツセット
+            setTimeout(() => {
+                document.getElementById('q-num').innerText = `${currentIndex + 1} / ${currentQueue.length}`;
+                document.getElementById('question-text').innerText = q.q;
+                
+                // 裏面（答え）の準備
+                document.getElementById('answer-text').innerText = q.a;
+                const expArea = document.getElementById('explanation-area');
+                if (q.exp) {
+                    expArea.innerText = "解説: " + q.exp;
+                    expArea.style.display = "block";
+                } else {
+                    expArea.style.display = "none";
+                }
+
+                // ボタンを隠す
+                document.getElementById('judgment-buttons').style.visibility = 'hidden';
+            }, 200); // カードが裏返っている間に書き換える
+        }
+
+        function flipCard() {
+            const card = document.getElementById('quiz-card');
+            
+            // カードが既に裏返っている（答え表示中）の場合
+            if (isCardFlipped) {
+                card.classList.remove('flipped'); // 表に戻す
+                isCardFlipped = false;
+                document.getElementById('judgment-buttons').style.visibility = 'hidden'; // ボタンを隠す
+            } else {
+                // カードが表（問題表示中）の場合
+                card.classList.add('flipped'); // 裏返す
+                isCardFlipped = true;
+
+                // 少し遅れて判定ボタンを表示
+                setTimeout(() => {
+                    if (isCardFlipped) { // まだ裏の状態なら表示
+                        document.getElementById('judgment-buttons').style.visibility = 'visible';
+                    }
+                }, 300);
+            }
+        }
+
+        function handleAnswer(isCorrect) {
+            const currentQ = currentQueue[currentIndex];
+
+            if (isCorrect) {
+                correctCount++;
+            } else {
+                wrongQueue.push(currentQ);
+            }
+
+            // 次へ
+            currentIndex++;
+            updateProgress();
+
+            if (currentIndex < currentQueue.length) {
+                showCard();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentIndex / currentQueue.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            document.getElementById('remaining-count').innerText = currentQueue.length - currentIndex;
+        }
+
+        function finishQuiz() {
+            document.getElementById('score-num').innerText = correctCount;
+            document.getElementById('total-num').innerText = currentQueue.length;
+            
+            const msg = document.getElementById('result-message');
+            const retryContainer = document.getElementById('retry-container');
+            const wrongCountSpan = document.getElementById('wrong-count');
+
+            if (wrongQueue.length === 0) {
+                msg.innerText = "素晴らしい！全問正解です！🎉";
+                msg.style.color = "var(--success-color)";
+                retryContainer.style.display = "none";
+            } else {
+                msg.innerText = "惜しい！まだ伸びしろがあります。";
+                msg.style.color = "var(--text-color)";
+                wrongCountSpan.innerText = wrongQueue.length;
+                retryContainer.style.display = "block";
+            }
+
+            switchScreen('result-screen');
+        }
+
+        function goHome() {
+            switchScreen('menu-screen');
+        }
+
+        // ユーティリティ: 配列シャッフル (Fisher-Yates)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // 初期設定
+        window.onload = function() {
+            // PWAとして動く際のスクロールバウンス防止など
+            document.body.addEventListener('touchmove', function(e) {
+                if(e.target.closest('.explanation-text')) return; // 解説エリアはスクロール許可
+                // e.preventDefault(); // 必要に応じて有効化
+            }, { passive: false });
+        }
+
+    </script>
+</body>
+</html>
