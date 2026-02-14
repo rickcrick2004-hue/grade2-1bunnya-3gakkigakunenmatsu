@@ -295,6 +295,14 @@
             width: 0%;
         }
 
+        /* タイマー表示 */
+        .timer-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            font-variant-numeric: tabular-nums; /* 数字の幅を揃える */
+        }
+
         /* 結果画面 */
         .result-stats {
             background: white;
@@ -308,7 +316,14 @@
             font-size: 3rem;
             font-weight: bold;
             color: var(--primary-color);
-            margin: 1rem 0;
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        .time-result {
+            font-size: 1.1rem;
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+            font-weight: bold;
         }
 
         .message {
@@ -367,6 +382,7 @@
             <!-- ナビゲーションエリア -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                 <button class="btn-small-nav" onclick="goHome()">🏠 中断</button>
+                <div class="timer-display" id="timer-display">00:00</div>
                 <div style="font-size: 0.9rem; color: #6b7280;">残り: <span id="remaining-count">0</span>問</div>
             </div>
 
@@ -407,6 +423,9 @@
                 <div class="score-display">
                     <span id="score-num">0</span> / <span id="total-num">0</span>
                 </div>
+                <div class="time-result">
+                    かかった時間: <span id="result-time">00:00</span>
+                </div>
                 <p id="result-message" class="message">お疲れ様でした！</p>
                 
                 <div id="retry-container" style="display: none;">
@@ -424,7 +443,7 @@
         // ==========================================
         // 設定・データ定義
         // ==========================================
-        const APP_VERSION = "Ver 1.2.3"; // 更新時はここを書き換える
+        const APP_VERSION = "Ver 1.2.4"; // 更新時はここを書き換える
         document.getElementById('version-display').innerText = APP_VERSION;
 
         // 問題データ
@@ -525,6 +544,10 @@
         let wrongQueue = [];
         let currentMode = 'sequential'; // 'sequential' or 'random'
         let isCardFlipped = false;
+        
+        // タイマー用変数
+        let timerInterval;
+        let startTime;
 
         // ==========================================
         // UI制御関数
@@ -541,6 +564,33 @@
         function switchScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
+        }
+
+        // ==========================================
+        // タイマーロジック
+        // ==========================================
+        function startTimer() {
+            startTime = Date.now();
+            updateTimerDisplay(); // 初回描画
+            timerInterval = setInterval(updateTimerDisplay, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function updateTimerDisplay() {
+            const now = Date.now();
+            const diff = now - startTime;
+            const formatted = formatTime(diff);
+            document.getElementById('timer-display').innerText = formatted;
+        }
+
+        function formatTime(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
 
         // ==========================================
@@ -577,6 +627,7 @@
             updateProgress();
             showCard();
             switchScreen('quiz-screen');
+            startTimer(); // タイマースタート
         }
 
         function retryWrong() {
@@ -591,6 +642,7 @@
             updateProgress();
             showCard();
             switchScreen('quiz-screen');
+            startTimer(); // タイマースタート
         }
 
         function showCard() {
@@ -670,6 +722,12 @@
         }
 
         function finishQuiz() {
+            stopTimer(); // タイマーストップ
+            
+            // 最終タイムの表示更新
+            const finalTime = document.getElementById('timer-display').innerText;
+            document.getElementById('result-time').innerText = finalTime;
+
             document.getElementById('score-num').innerText = correctCount;
             document.getElementById('total-num').innerText = currentQueue.length;
             
@@ -692,6 +750,7 @@
         }
 
         function goHome() {
+            stopTimer(); // タイマーストップ
             switchScreen('menu-screen');
         }
 
